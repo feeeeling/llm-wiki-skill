@@ -1,0 +1,55 @@
+---
+# Install in the CODE repo. Secrets: WIKI_REPO, WIKI_TOKEN
+name: llm-wiki-dispatch
+on:
+  push:
+    branches:
+      - main
+      - master
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Notify wiki repo
+        env:
+          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+          WIKI_REPO: ${{ secrets.WIKI_REPO }}
+          OLD: ${{ github.event.before }}
+          NEW: ${{ github.sha }}
+          NAME: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          if [ -z "${WIKI_TOKEN:-}" ] || [ -z "${WIKI_REPO:-}" ]; then
+            echo "skip: secrets not set"
+            exit 0
+          fi
+          files=$(git diff --name-only "$OLD" "$NEW" || true)
+          python3 - "$WIKI_REPO" "$NAME" "$OLD" "$NEW" "$files" <<'PY'
+          import json, os, sys, urllib.request
+          wiki, name, old, new, files = sys.argv[1:6]
+          body = {
+            "event_type": "llm-wiki-drift",
+            "client_payload": {
+              "repo_name": name,
+              "old_rev": old,
+              "new_rev": new,
+              "files": files,
+            },
+          }
+          token = os.environ["WIKI_TOKEN"]
+          url = "https://api.github.com/repos/%s/dispatches" % wiki
+          req = urllib.request.Request(
+            url,
+            data=json.dumps(body).encode(),
+            headers={
+              "Accept": "application/vnd.github+json",
+              "Authorization": "Bearer " + token,
+              "Content-Type": "application/json",
+            },
+            method="POST",
+          )
+          urllib.request.urlopen(req)
+          PY

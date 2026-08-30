@@ -1,0 +1,16 @@
+---
+# Copy to sources/<name>.yaml and delete the .disabled suffix.
+# Restricted YAML (scalars + "key:" followed by "- item" lists). Parsed by bash.
+name: my-repo
+git: git@github.com:OWNER/REPO.git
+local_paths:
+  - /absolute/path/to/local/clone
+track:
+  - src/
+  - docs/
+  - README.md
+# Set to the git rev last successfully compiled into wiki/.
+# Leave as REPLACE_AFTER_FIRST_INGEST until the first ingest.
+compiled_rev: REPLACE_AFTER_FIRST_INGEST
+pages:
+  - wiki/concepts/example.md

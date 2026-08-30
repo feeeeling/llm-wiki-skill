@@ -1,0 +1,38 @@
+---
+name: llm-wiki-drift-ticket
+on:
+  repository_dispatch:
+    types:
+      - llm-wiki-drift
+  workflow_dispatch:
+    inputs:
+      repo_name:
+        required: true
+      old_rev:
+        required: true
+      new_rev:
+        required: true
+jobs:
+  ticket:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Write drift ticket
+        env:
+          REPO_NAME: ${{ inputs.repo_name }}
+          OLD_REV: ${{ inputs.old_rev }}
+          NEW_REV: ${{ inputs.new_rev }}
+          D_REPO: ${{ github.event.client_payload.repo_name }}
+          D_OLD: ${{ github.event.client_payload.old_rev }}
+          D_NEW: ${{ github.event.client_payload.new_rev }}
+        run: bash scripts/gh-write-drift.sh
+      - name: Commit ticket
+        run: |
+          git config user.name "llm-wiki-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add queue/drift
+          git diff --cached --quiet && exit 0
+          git commit -m "drift: ticket"
+          git push
