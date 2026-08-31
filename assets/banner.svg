@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="280" viewBox="0 0 960 280" role="img" aria-label="llm-wiki">
+  <rect width="960" height="280" fill="#111318"/>
+  <rect x="0" y="0" width="8" height="280" fill="#d4a017"/>
+  <!-- pages -->
+  <g fill="none" stroke="#c8cdd6" stroke-width="2">
+    <rect x="72" y="78" width="88" height="118" rx="4"/>
+    <rect x="92" y="64" width="88" height="118" rx="4"/>
+    <rect x="112" y="50" width="88" height="118" rx="4"/>
+  </g>
+  <g stroke="#d4a017" stroke-width="2" fill="none">
+    <line x1="128" y1="78" x2="184" y2="78"/>
+    <line x1="128" y1="98" x2="176" y2="98"/>
+    <line x1="128" y1="118" x2="168" y2="118"/>
+  </g>
+  <!-- dual gates -->
+  <g fill="none" stroke="#c8cdd6" stroke-width="2">
+    <path d="M248 88 v92"/>
+    <path d="M248 88 h28 a18 18 0 0 1 0 36 h-28"/>
+    <path d="M248 124 h28 a18 18 0 0 1 0 36 h-28"/>
+    <circle cx="276" cy="106" r="3" fill="#d4a017" stroke="none"/>
+    <circle cx="276" cy="142" r="3" fill="#d4a017" stroke="none"/>
+  </g>
+  <text x="340" y="118" fill="#f4f1ea" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="44" font-weight="700">llm-wiki</text>
+  <text x="340" y="158" fill="#9aa3b2" font-family="ui-sans-serif, system-ui, sans-serif" font-size="18">Karpathy pattern · dual gate against rot</text>
+  <text x="340" y="188" fill="#6b7380" font-family="ui-sans-serif, system-ui, sans-serif" font-size="14">compile on ingest · git-sync · Agent Skills</text>
+</svg>
