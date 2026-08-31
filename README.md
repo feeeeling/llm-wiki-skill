@@ -16,6 +16,7 @@
 </p>
 
 <p align="center">
+  <a href="https://feeeeling.github.io/llm-wiki-skill/">Landing page</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#dual-gate">Dual gate</a> ·
   <a href="#daily-loop">Daily loop</a> ·
