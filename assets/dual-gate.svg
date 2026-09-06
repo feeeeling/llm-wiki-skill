@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" role="img" aria-labelledby="title desc">
+  <title id="title">双层闸门：脚本发现变化，Agent 按需维护</title>
+  <desc id="desc">上排从左到右：代码变更触发检查，比较已整理版本与跟踪路径，有相关变化则生成待检工单。工单等待下次阅读或手动维护。下排从右到左：读取工单，Agent 复核来源与关联页面，完成后关闭工单并记录版本。Git 无需等待模型，软闸门依赖 Agent 遵守协议。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M1 1L8 5L1 9" fill="none" stroke="#788967" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+  <rect width="1000" height="600" rx="8" fill="#f3f1e7"/>
+  <g font-family="'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif">
+    <text x="48" y="51" fill="#233522" font-size="25" font-weight="600">发现变化，不急着重写。</text>
+    <text x="952" y="49" text-anchor="end" fill="#526342" font-family="'Courier New', monospace" font-size="13" letter-spacing="1.5">THE MAINTENANCE LOOP</text>
+    <path d="M48 73H952" stroke="#cbd0bf"/>
+
+    <text x="48" y="112" fill="#526342" font-size="16" font-weight="600">01 / 硬闸门</text>
+    <text x="178" y="112" fill="#66705e" font-size="15">脚本检测 · 不调用模型</text>
+
+    <!-- Top lane: source changes → deterministic check → durable ticket. -->
+    <g fill="none" stroke="#526342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M85 150V187M89 165C112 165 112 156 112 150"/>
+      <circle cx="85" cy="146" r="5" fill="#f3f1e7"/>
+      <circle cx="85" cy="191" r="5" fill="#f3f1e7"/>
+      <circle cx="112" cy="145" r="5" fill="#f3f1e7"/>
+      <path d="M396 145H426M396 166H426M396 187H426"/>
+      <circle cx="404" cy="145" r="4" fill="#f3f1e7"/>
+      <circle cx="418" cy="166" r="4" fill="#f3f1e7"/>
+      <circle cx="408" cy="187" r="4" fill="#f3f1e7"/>
+    </g>
+    <g fill="none" stroke="#788967" stroke-width="1.5" marker-end="url(#arrow)">
+      <path d="M234 167H351"/>
+      <path d="M554 167H685"/>
+    </g>
+    <text x="72" y="225" fill="#233522" font-size="23" font-weight="600">代码发生变更</text>
+    <text x="72" y="253" fill="#66705e" font-size="16">Git Hook / 手动检查</text>
+    <text x="384" y="225" fill="#233522" font-size="23" font-weight="600">筛选相关变化</text>
+    <text x="384" y="253" fill="#66705e" font-size="16">已整理版本 × 跟踪路径</text>
+    <text x="620" y="150" text-anchor="middle" fill="#66705e" font-size="13">有相关差异</text>
+
+    <!-- The ticket is the only boxed object: an artifact, not another service. -->
+    <rect x="708" y="130" width="244" height="139" rx="5" fill="#e9eddc" stroke="#b8c2a7"/>
+    <path d="M726 151H746M726 159H740" stroke="#526342" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="844" cy="153" r="4" fill="#ad593b"/>
+    <text x="855" y="158" fill="#8b482e" font-family="'Courier New', monospace" font-size="13">PENDING</text>
+    <text x="726" y="211" fill="#233522" font-size="23" font-weight="600">留下待检工单</text>
+    <text x="726" y="245" fill="#526342" font-family="'Courier New', monospace" font-size="16">queue/drift/</text>
+
+    <!-- Dashed handoff marks deferred work, not a blocking LLM call. -->
+    <path d="M830 270V379" fill="none" stroke="#788967" stroke-width="1.5" stroke-dasharray="4 6" marker-end="url(#arrow)"/>
+    <text x="808" y="309" text-anchor="end" fill="#8b482e" font-size="16">先留下工单，稍后再处理</text>
+    <text x="808" y="334" text-anchor="end" fill="#66705e" font-size="14">Git 无需等待模型</text>
+
+    <text x="48" y="366" fill="#526342" font-size="16" font-weight="600">02 / 软闸门</text>
+    <text x="178" y="366" fill="#66705e" font-size="15">Agent 复核 · 按协议执行</text>
+
+    <!-- Bottom lane returns right-to-left: resume → review → record. -->
+    <g fill="none" stroke="#526342" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M819 397L839 411L819 425Z"/>
+      <path d="M395 393Q407 389 420 395Q433 389 445 393V423Q433 419 420 425Q407 419 395 423ZM420 395V425"/>
+      <path d="M401 401L413 403M427 403L439 401M401 409L413 411"/>
+      <circle cx="97" cy="410" r="18"/>
+      <path d="M88 410L94 416L107 403"/>
+    </g>
+    <g fill="none" stroke="#788967" stroke-width="1.5" marker-end="url(#arrow)">
+      <path d="M710 411H563"/>
+      <path d="M353 411H235"/>
+    </g>
+    <text x="740" y="467" fill="#233522" font-size="23" font-weight="600">按需开始维护</text>
+    <text x="740" y="495" fill="#66705e" font-size="16">下次阅读 / 手动请求</text>
+    <text x="384" y="467" fill="#233522" font-size="23" font-weight="600">复核并更新页面</text>
+    <text x="384" y="495" fill="#66705e" font-size="16">对照来源，修订关联知识</text>
+    <text x="72" y="467" fill="#233522" font-size="23" font-weight="600">完成并留痕</text>
+    <text x="72" y="495" fill="#66705e" font-size="16">关闭工单 · 记录版本</text>
+    <path d="M48 538H952" stroke="#cbd0bf"/>
+    <text x="48" y="574" fill="#526342" font-size="15">脚本负责发现变化。Agent 负责理解变化。</text>
+    <text x="952" y="574" text-anchor="end" fill="#66705e" font-family="'Courier New', monospace" font-size="13">DETECT → REVIEW → RECORD</text>
+  </g>
+</svg>
