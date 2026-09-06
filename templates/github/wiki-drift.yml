@@ -1,17 +1,14 @@
 ---
-name: llm-wiki-drift-ticket
-on:
+# Optional: install in the WIKI repo only after configuring the source.
+name: llm-wiki-remote-signal
+"on":
   repository_dispatch:
-    types:
-      - llm-wiki-drift
-  workflow_dispatch:
-    inputs:
-      repo_name:
-        required: true
-      old_rev:
-        required: true
-      new_rev:
-        required: true
+    types: [llm-wiki-drift]
+permissions:
+  contents: read
+concurrency:
+  group: wiki-remote-signals
+  cancel-in-progress: false
 jobs:
   ticket:
     runs-on: ubuntu-latest
@@ -19,20 +16,22 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Write drift ticket
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Record revision signal (no path or LLM check)
         env:
-          REPO_NAME: ${{ inputs.repo_name }}
-          OLD_REV: ${{ inputs.old_rev }}
-          NEW_REV: ${{ inputs.new_rev }}
-          D_REPO: ${{ github.event.client_payload.repo_name }}
-          D_OLD: ${{ github.event.client_payload.old_rev }}
-          D_NEW: ${{ github.event.client_payload.new_rev }}
-        run: bash scripts/gh-write-drift.sh
-      - name: Commit ticket
+          SOURCE_ID: ${{ github.event.client_payload.source_id }}
+          SOURCE_REPOSITORY: ${{ github.event.client_payload.repository }}
+          NEW_REV: ${{ github.event.client_payload.new_rev }}
+        run: python scripts/cloud_signal.py
+      - name: Commit only drift signals
         run: |
           git config user.name "llm-wiki-bot"
           git config user.email "bot@users.noreply.github.com"
           git add queue/drift
           git diff --cached --quiet && exit 0
-          git commit -m "drift: ticket"
+          git commit -m "Record source revision signal"
           git push

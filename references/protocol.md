@@ -1,28 +1,34 @@
-# Protocol
+# Ingest / query / maintenance
+
+The full host-independent agreement is [templates/AGENTS.md](../templates/AGENTS.md).
+A wiki receives its own copy during init. Read that local copy before acting.
+No special slash command, model vendor, or skill directory is assumed.
 
 ## Ingest
 
-1. `git pull --rebase` in the wiki repo.
-2. `bash scripts/check-drift.sh --report`. Drain `status: pending` tickets first.
-3. Read the source (`raw/...` or `git diff old_rev new_rev -- <files>`).
-4. Update existing entity/concept pages. Do not fork a second page for the same idea.
-5. On contradiction, keep history on the page (old rev claimed A; new rev is B).
-6. Use Obsidian wikilinks so the graph works: `[[concepts/auth]]`.
-7. Refresh `wiki/index.md`. Append `wiki/log.md`:
-   `## [YYYY-MM-DD] ingest | title`
-8. Set page `status: current` and `rev`. Set yaml `compiled_rev` when the
-   ticket is fully applied. Ticket `status: done`.
-9. Commit. Ask the user to `git push`.
-
-Scope to the ticket. Never rebuild the whole wiki for one file.
+Preserve the original source snapshot, cite it in compiled pages, update related
+knowledge rather than duplicating it, then maintain the index and append-only log.
+For code, register a source and review a pinned commit. Advance `compiled_rev` only
+when its affected tracked scope is covered; never advance it merely because a diff
+was detected. Clearly label inferred claims and unverified implementation details.
 
 ## Query
 
-1. Dual-gate check (pending tickets / `stale` pages) before answering.
-2. Read `wiki/index.md`, then a few pages. Cite them.
-3. File expensive answers into `wiki/syntheses/`.
+Read the index, check relevant pending tickets, trace claims to sources. If source
+access is missing or review remains incomplete, say which snapshot you used and
+what is uncertain. The protocol requires review of relevant stale pages; it does
+not implement a runtime block on model responses.
 
-## Lint / `/wiki-lint`
+## Maintenance
 
-Drain every pending ticket. Then scan for `stale`, `compiled_rev` behind
-HEAD, contradictions, orphans, missing citations.
+Use `status` for the queue and `check --all` for local Git changes. Resolve tickets
+by reviewing source changes and mapped pages, recording the outcome and reviewed
+revision, and closing only covered tickets. Unrelated work can proceed independently.
+Semantic lint also checks contradictions, orphan pages, broken links and citations.
+These semantic operations require a capable maintainer; the CLI does not call an LLM.
+
+## Sync
+
+Inspect local changes and remote/upstream state before pulling. Do not auto-stash,
+stage all files, force-push, or discard another writer's work. Push only when the
+user has authorized it. Local-only use needs neither remote nor credentials.

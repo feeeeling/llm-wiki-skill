@@ -1,0 +1,7 @@
+{
+  "name": "my-repo",
+  "git": "https://github.com/OWNER/REPO.git",
+  "track": ["src/", "README.md"],
+  "compiled_rev": null,
+  "pages": ["wiki/concepts/my-project.md"]
+}

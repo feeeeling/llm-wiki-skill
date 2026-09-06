@@ -1,66 +1,66 @@
 ---
 name: llm-wiki
 description: >
-  Build and maintain a local, git-synced LLM wiki with a dual gate against stale pages.
-  Use when initializing a wiki, ingesting sources, answering from the wiki, linting,
-  handling drift tickets, installing git hooks, or when the user mentions LLM wiki,
-  Karpathy wiki, check-drift, or /wiki-lint.
+  Build and maintain a local, Git-versioned Markdown knowledge base. Use when
+  collecting sources, querying a wiki with citations, reviewing stale knowledge,
+  processing drift tickets, or setting up an LLM wiki. Works through ordinary
+  file and command access; no particular agent or slash command is required.
 ---
 
 # LLM Wiki
 
-Persistent markdown wiki. The LLM writes `wiki/`; humans curate sources and questions. Knowledge is compiled at ingest time, not re-derived on every query.
+You are a maintainer of the user's knowledge repository, not an installer for a
+particular agent. This skill is optional: the same protocol is usable by a human
+or any assistant with local file access. Do not install a specific host.
 
-This skill is the **maintainer program**. The user's wiki git repo is the **knowledge**. Do not mix them.
+## Capabilities first
 
-## Locate the wiki
+- With local file and terminal access: use the CLI below and read/edit pages.
+- With file access only: inspect source configs and tickets as files; ask the user
+  to run checks when necessary. Do not claim checks passed without results.
+- Text-only chat: request the protocol and relevant sources; produce drafts for
+  the user to save. Do not pretend to write files or synchronize GitHub.
+- No model, API key, MCP server, Obsidian, or global skill directory is required
+  by the mechanical tools. A model is supplied by the user's chosen host.
 
-Wiki root = directory containing `AGENTS.md` and `sources/`.
+## Find the wiki
 
-Search order: `--wiki` / `$LLM_WIKI_ROOT` / walk up from cwd / ask the user.
+Use the user-provided path, `LLM_WIKI_ROOT`, or a directory containing `AGENTS.md`
+and `sources/`. Ask if ambiguous. Read the wiki's `AGENTS.md` before maintaining it.
+Do not confuse this skill's templates with the user's knowledge. For an older wiki
+without `scripts/wiki.py`, use this skill checkout's CLI with explicit `--wiki` for
+checks; ask before migrating its scripts or protocol. Do not install new hooks
+until the wiki has the matching Python runtime.
 
-If none exists, run init (do not invent a wiki in a random project repo).
+## Entry points
 
-## Commands
+Resolve this skill's root from the location of this SKILL.md. Use Python 3.9+
+(`python3`, `python`, or `py -3`, according to the user's environment) and Git.
+Never assume the terminal cwd is the wiki. Pass `--wiki` explicitly when uncertain.
 
-Resolve `SKILL_DIR` as the directory that contains this `SKILL.md`.
+| Intent | Action |
+| --- | --- |
+| Initialize | `python3 <skill>/scripts/wiki.py init <empty-directory>` |
+| Diagnose setup | `python3 <wiki>/scripts/wiki.py doctor --wiki <wiki>` |
+| List pending | `python3 <wiki>/scripts/wiki.py status --wiki <wiki>` |
+| Scan registered code | `python3 <wiki>/scripts/wiki.py check --wiki <wiki> --all` |
+| Register source | `python3 <wiki>/scripts/wiki.py register NAME --wiki <wiki> --repo <code>` |
+| Bind another device | `python3 <wiki>/scripts/wiki.py bind NAME --wiki <wiki> --repo <code>` |
+| Optional hooks | `python3 <wiki>/scripts/wiki.py hooks --wiki <wiki> --source NAME` |
+| Ingest, query, maintenance | Follow the wiki's AGENTS.md and [protocol](references/protocol.md) |
 
-| User intent | Do this |
-| ------------- | --------- |
-| init / 新建 | `bash "$SKILL_DIR/scripts/init-wiki.sh" <target-dir>` then commit |
-| status / 未完成工单 | `bash "<wiki>/scripts/check-drift.sh" --report` |
-| 手动消化工单 / lint / `/wiki-lint` | Read `references/protocol.md`, process every `queue/drift/*.md` with `status: pending` |
-| ingest 一篇源 | Protocol ingest. Refuse if pending drift exists unless the user wants drift processed first |
-| 提问 / 阅读 wiki | `--report` first. Pending or `status: stale` pages → targeted ingest, then answer |
-| 给代码仓装硬闸门 | `bash "<wiki>/scripts/install-hooks.sh" <code-repo>` |
-| 登记代码仓 | Copy `templates/source.yaml` → `sources/<name>.yaml`, fill `git` / `local_paths` / `track` |
+`status` never scans code. `check` never calls a model or advances the reviewed
+baseline. Initial ingest must establish `compiled_rev`; a newer SHA alone does not
+prove that an existing claim is false. Pending relevant tickets require review;
+unavailable sources must be reported as unknown.
 
-After init, prefer **wiki-local** scripts (`<wiki>/scripts/…`) so hooks do not depend on this skill path.
+## Safety and synchronization
 
-## Dual gate (non-negotiable)
+Init never overwrites a nonempty directory or commits/pushes automatically.
+Machine-specific repo paths are ignored local bindings; share source IDs and URLs.
+Hooks are opt-in and must preserve existing user automation. See [hooks](references/hooks.md).
+Do not silently edit global config, provision services, or upload private data.
+The soft gate is a protocol, not a runtime-enforced guarantee.
 
-**Hard gate (mechanical):** `check-drift.sh` only opens tickets under `queue/drift/`. It never calls an LLM and never rewrites wiki prose.
-
-**Soft gate (you):** Before query or ingest, read pending tickets. Update mapped pages from `git diff old_rev new_rev`, then close the ticket (`status: done`), set page `status: current`, move `compiled_rev`.
-
-Details: [references/protocol.md](references/protocol.md), [references/hooks.md](references/hooks.md).
-
-## Layout (wiki repo)
-
-```text
-AGENTS.md          schema (soft gate) — you and the user co-evolve this
-raw/               immutable non-code sources
-wiki/              pages you own; humans rarely edit
-sources/*.yaml     code-repo pointers (not a copy of the code)
-queue/drift/       pending/done tickets (must be git-committed to sync devices)
-scripts/           check-drift.sh, install-hooks.sh
-```
-
-## Rules
-
-- `raw/` and tracked code are source of truth. Never modify them.
-- Pull `--rebase` the wiki repo before you write; push when a unit of work is done. One writer at a time.
-- File good answers back into `wiki/` instead of leaving them in chat.
-- Scope ingest to the ticket's files/pages. Do not rebuild the whole wiki.
-- If a claim contradicts a newer rev: record the change on the page, do not silently delete the old claim.
-- Read [templates/AGENTS.md](templates/AGENTS.md) only when initializing or when the wiki's AGENTS.md is missing sections.
+Read [onboarding](references/onboarding.md) for installation paths, CLI usage,
+GitHub setup, platform requirements, and migration from the shell-only version.

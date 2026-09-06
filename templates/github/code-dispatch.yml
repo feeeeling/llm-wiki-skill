@@ -1,55 +1,28 @@
 ---
-# Install in the CODE repo. Secrets: WIKI_REPO, WIKI_TOKEN
+# Optional: install in the CODE repo. Dispatch only; no shallow-history diff.
+# Secrets: WIKI_TOKEN (scoped to destination repo), WIKI_REPO (owner/repo).
+# Repository variable WIKI_SOURCE: registered source ID (defaults to repo name).
 name: llm-wiki-dispatch
-on:
+"on":
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
+permissions: {}
 jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Notify wiki repo
+      - name: Notify wiki
         env:
-          WIKI_TOKEN: ${{ secrets.WIKI_TOKEN }}
+          GH_TOKEN: ${{ secrets.WIKI_TOKEN }}
           WIKI_REPO: ${{ secrets.WIKI_REPO }}
-          OLD: ${{ github.event.before }}
-          NEW: ${{ github.sha }}
-          NAME: ${{ github.event.repository.name }}
+          SOURCE_ID: ${{ vars.WIKI_SOURCE || github.event.repository.name }}
+          SOURCE_REPOSITORY: ${{ github.repository }}
+          NEW_REV: ${{ github.sha }}
         run: |
           set -euo pipefail
-          if [ -z "${WIKI_TOKEN:-}" ] || [ -z "${WIKI_REPO:-}" ]; then
-            echo "skip: secrets not set"
-            exit 0
-          fi
-          files=$(git diff --name-only "$OLD" "$NEW" || true)
-          python3 - "$WIKI_REPO" "$NAME" "$OLD" "$NEW" "$files" <<'PY'
-          import json, os, sys, urllib.request
-          wiki, name, old, new, files = sys.argv[1:6]
-          body = {
-            "event_type": "llm-wiki-drift",
-            "client_payload": {
-              "repo_name": name,
-              "old_rev": old,
-              "new_rev": new,
-              "files": files,
-            },
-          }
-          token = os.environ["WIKI_TOKEN"]
-          url = "https://api.github.com/repos/%s/dispatches" % wiki
-          req = urllib.request.Request(
-            url,
-            data=json.dumps(body).encode(),
-            headers={
-              "Accept": "application/vnd.github+json",
-              "Authorization": "Bearer " + token,
-              "Content-Type": "application/json",
-            },
-            method="POST",
-          )
-          urllib.request.urlopen(req)
-          PY
+          test -n "$GH_TOKEN" && test -n "$WIKI_REPO"
+          jq -n --arg id "$SOURCE_ID" --arg repo "$SOURCE_REPOSITORY" \
+            --arg rev "$NEW_REV" \
+            '{event_type: "llm-wiki-drift", client_payload: {
+              source_id: $id, repository: $repo, new_rev: $rev
+            }}' | gh api "repos/$WIKI_REPO/dispatches" --input -
