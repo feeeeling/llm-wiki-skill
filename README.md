@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD033 MD041 -->
 
 <p align="center">
-  <img src="assets/banner.svg" width="1200" alt="llm-wiki — 将资料编译成相互连接、持续维护的本地知识库">
+  <img src="assets/banner.jpg" width="1200" alt="LLM Wiki Skill — LLM 知识库·技能手册·实战指南">
 </p>
 
 <p align="center">
